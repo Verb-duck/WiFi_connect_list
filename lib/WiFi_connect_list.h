@@ -1,11 +1,10 @@
-#ifndef WiFi_connect_h
-#define WiFi_connect_h
+#ifndef WiFi_connect_list_h
+#define WiFi_connect_list_h
 #include <Arduino.h>
 #include <ESP8266WiFi.h>        //wifi
 #include <ESP8266mDNS.h>        //wifi
 #include <ArduinoOTA.h>         //ota
 #include <ESP8266httpUpdate.h>  //ota http
-
 #include <PubSubClient.h>       //mqtt
 
 #define ssid "5G OBLUCHATEL"
