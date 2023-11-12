@@ -5,6 +5,12 @@ bool WiFi_Connected()
 {
   if (WiFi.isConnected())
   {
+     static int32_t timer = 0;
+     if(millis() - timer >= 1000)
+     {
+       timer += 1000;
+       Serial.println("242");
+     }
     return true;
   }
   else

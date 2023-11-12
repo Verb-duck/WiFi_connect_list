@@ -1,5 +1,5 @@
 #include <Arduino.h>
- #include "WiFi_connect_list.h"
+#include "WiFi_connect_list.h"
 
 #define MQTT_TOPIC_OTA "device/ota/esp1"
 /*  --wemos d1 pin--
@@ -14,14 +14,13 @@
 void setup()
 {
 	Serial.begin(115200);
-	// WiFi_Connected();
-	// OTA_begin(MQTT_TOPIC_OTA);
+	 
 }
 
 void loop()
 {
-	// WiFi_Connected();
-	// OTA_update();
+	 WiFi_Connected();
+	 OTA_update();
 	//  static int32_t timer = 0;
 	//  if(millis() - timer >= 1000)
 	//  {
