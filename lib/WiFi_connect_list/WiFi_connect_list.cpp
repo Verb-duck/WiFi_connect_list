@@ -7,7 +7,7 @@ bool WiFi_connect_list::WiFi_connecting()
   {     
     return true;
   }
-  else
+  else     //переподключение к ВиФи
   {
     Serial.println();
     Serial.println("Connection failed! Fixing");
@@ -29,10 +29,11 @@ bool WiFi_connect_list::WiFi_connecting()
     Serial.println();
     Serial.print("WiFi connected. IP address: ");
     Serial.println(WiFi.localIP());
+
+    begin_OTA_WiFi_to_IP();         //инициализация обновления прошшивки по IP
     return true;
   }
 }
-
 // обновление прошивки по ВиФи по IP
 void WiFi_connect_list::begin_OTA_WiFi_to_IP()
 {
@@ -68,6 +69,57 @@ void WiFi_connect_list::begin_OTA_WiFi_to_IP()
   ArduinoOTA.begin();
   ArduinoOTA.setPassword(passwordW);
 }
+//обработчик сообше
+void WiFi_connect_list::mqtt_callback(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Message arrived ["); Serial.print(topic); Serial.print("] ");
+  for (int i = 0; i < length; i++) Serial.print((char)payload[i]); Serial.println();
 
+  if ((char)payload[0] == '1')
+  {    
+  }
+  else
+  {
+  }
+}
+//подключение к mqtt брокеру
+bool WiFi_connect_list::mqtt_connecting()
+{
+  if (!mqttClient.connected())
+  {
+    mqttClient.setClient(wificlient);
+    mqttClient.setServer(mqttServer, mqttPort);
+    Serial.print("Connecting to MQTT ... ");
+    // Attempt to connect
+    if (mqttClient.connect(mqttClientId, mqttUser, mqttPass,
+      mqttTopicDeviceStatus, mqttDeviceStatusQos , mqttDeviceStatusRetained, mqttDeviceStatusOff))      
+    {      
+      Serial.println("connected MQTT Ok.");
+      //отправим сообщение я в сети
+      mqttClient.publish(mqttTopicDeviceStatus, mqttDeviceStatusOn,mqttDeviceStatusRetained);
+    }
+    else
+    {
+      Serial.print("failed, error code: ");
+      Serial.print(mqttClient.state());
+      Serial.println("");
+    }
+    return mqttClient.connected();
+  }
+  return true;
+}
 
+bool WiFi_connect_list::loop()
+{
+  if (WiFi_connecting()) // если есть подкоючение
+  {
+    ArduinoOTA.handle(); // проверим обновление по IP
+    if (mqtt_connecting())  // проверяем подключение к брокеру
+    {
+      mqttClient.loop(); // и отправляем сообщение
+    }
+    return true;
+  }
+  return false;
+}
 

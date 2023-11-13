@@ -10,11 +10,11 @@
 	d4 - high
 	d9 - low
 	*/
-	WiFi_connect_list WiFi_chek;
+	WiFi_connect_list WiFi_chek("badroom_head");
+	
 
 void setup()
-{
-	WiFi_chek.begin();
+{	
 	Serial.begin(115200);
 	 
 }
@@ -22,10 +22,12 @@ void setup()
 void loop()
 {
 	WiFi_chek.loop();
-	//  static int32_t timer = 0;
-	//  if(millis() - timer >= 1000)
-	//  {
-	//    timer += 1000;
-	//    Serial.println(2);
-	//  }
+	static uint32_t time = 0;
+	if(millis() - time >= 1000)
+	{
+		time += 1000;
+		static int ii = 0;
+		ii++;
+		//mqttClient.publish();
+	}	
 }
