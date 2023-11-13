@@ -1,16 +1,10 @@
 #include "WiFi_connect_list.h"
 
 // подключение в ВиФи
-bool WiFi_Connected()
+bool WiFi_connect_list::WiFi_connecting()
 {
   if (WiFi.isConnected())
-  {
-     static int32_t timer = 0;
-     if(millis() - timer >= 1000)
-     {
-       timer += 1000;
-       Serial.println("242");
-     }
+  {     
     return true;
   }
   else
@@ -25,7 +19,7 @@ bool WiFi_Connected()
     {
       count_attempt++;
       Serial.print("*");
-      if (count_attempt > 100)
+      if (count_attempt > 50)
       {
         Serial.println();
         Serial.println("WiFi connection failed");
@@ -38,8 +32,9 @@ bool WiFi_Connected()
     return true;
   }
 }
+
 // обновление прошивки по ВиФи по IP
-void begin_OTA_WiFi_to_IP()  
+void WiFi_connect_list::begin_OTA_WiFi_to_IP()
 {
   ArduinoOTA.onStart([]()
                      {
@@ -74,12 +69,5 @@ void begin_OTA_WiFi_to_IP()
   ArduinoOTA.setPassword(passwordW);
 }
 
-// обновление прошивки
-void OTA_begin(const char *mqtt_ota_update)
-{
-  begin_OTA_WiFi_to_IP(); // обновление по ВиФи
-}
-void OTA_update() 
-{ 
-  ArduinoOTA.handle(); 
-} // обновление по ВиФи по IP
+
+

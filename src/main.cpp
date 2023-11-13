@@ -10,17 +10,18 @@
 	d4 - high
 	d9 - low
 	*/
+	WiFi_connect_list WiFi_chek;
 
 void setup()
 {
+	WiFi_chek.begin();
 	Serial.begin(115200);
 	 
 }
 
 void loop()
 {
-	 WiFi_Connected();
-	 OTA_update();
+	WiFi_chek.loop();
 	//  static int32_t timer = 0;
 	//  if(millis() - timer >= 1000)
 	//  {

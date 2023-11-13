@@ -7,15 +7,34 @@
 #include <ESP8266httpUpdate.h>  //ota http
 #include <PubSubClient.h>       //mqtt
 
-#define ssid1 "5G OBLUCHATEL"
-#define passwordW1 "00000000"
-#define ssid "хуета"
-#define passwordW "20192020"
+#define ssid "5G OBLUCHATEL"
+#define passwordW "00000000"
+//#define ssid "хуета"
+//#define passwordW "20192020"
 
-bool WiFi_Connected();       // подключение в ВиФи    
-void begin_OTA_WiFi_to_IP(); // обновление по ВиФи по IP
-void OTA_begin(const char *mqtt_ota_update);// обновление прошивки, все в одном месте
-void OTA_update();           // обновление по ВиФи по IP
+class WiFi_connect_list {
+	private:
+		bool WiFi_connecting();				//подключение к ВиФи
+		void begin_OTA_WiFi_to_IP();  // обновление по IP
+	public:
+		WiFi_connect_list() {}
+		void begin() 
+		{
+			if(WiFi_connecting()) 
+			{
+				begin_OTA_WiFi_to_IP();
+			}
+		}
+		bool loop ()       
+		{
+			if(WiFi_connecting())			//если есть подкоючение
+			{
+				ArduinoOTA.handle(); 		//проверим обновление по IP
+				return true;
+			}
+			return false;
+		}
+};
 
 
 #endif
