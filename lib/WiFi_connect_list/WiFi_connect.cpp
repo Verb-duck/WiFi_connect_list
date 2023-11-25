@@ -74,7 +74,7 @@ void begin_OTA_WiFi_to_IP()
 
 bool WiFi_loop()
 {
-  if (WiFi_connected()) // если есть подкоючение
+  if (WiFi_connected()) // если есть подключение
   {
     ArduinoOTA.handle(); // проверим обновление по IP
     if (mqttObject::mqtt_connected())  // проверяем подключение к брокеру
@@ -117,10 +117,33 @@ void WiFi_scan()
     WiFi.scanDelete();
   }
 }
-//************************************
+
+
+//***************mqtt*********************
 //----class mqttObject---
 WiFiClient mqttObject::wificlient;
 PubSubClient mqttObject::mqttClient(mqttServer, mqttPort,wificlient);
+char* mqttObject::mqttClientId ;
+char* mqttObject::mqttTopicDeviceStatus;
+char* mqttObject::mqttTopicOta;
+
+void mqttObject::name_device(const char* name) {
+  //присваение именю модулю
+  mqttClientId = new char[strlen(name) + 1];
+  strcpy(mqttClientId, name);
+  //топик для отображения статуса модуля
+  mqttTopicDeviceStatus = new char[strlen(name) + strlen(mqttHeadTopic)
+    + strlen("/status") + 1];
+  strcpy(mqttTopicDeviceStatus,mqttHeadTopic);
+  strcat(mqttTopicDeviceStatus,mqttClientId);
+  strcat(mqttTopicDeviceStatus,"/status");
+  //топик для прошивки модуля
+  mqttTopicOta = new char[strlen(name) + strlen(mqttHeadTopic) 
+    + + strlen("/ota") + 1];
+  strcpy(mqttTopicOta,mqttHeadTopic);
+  strcat(mqttTopicOta,mqttClientId);
+  strcat(mqttTopicOta,"/ota");  
+}
 //подключение к mqtt брокеру
 bool mqttObject::mqtt_connected()
 {
@@ -129,11 +152,11 @@ bool mqttObject::mqtt_connected()
     Serial.print("Connecting to MQTT ... ");
     //отправка LWT сообщения
     if (mqttClient.connect(mqttClientId, mqttUser, mqttPass,
-      mqttTopicDeviceStatus, mqttDeviceStatusQos , mqttDeviceStatusRetained, mqttDeviceStatusOff))      
+      mqttTopicDeviceStatus, mqttQos_1 , mqttRetained_1, mqttDeviceStatusOff))      
     {      
       Serial.println("connected MQTT Ok.");
       //отправим сообщение я в сети, online
-      mqttClient.publish(mqttTopicDeviceStatus, mqttDeviceStatusOn,mqttDeviceStatusRetained);
+      mqttClient.publish(mqttTopicDeviceStatus, mqttDeviceStatusOn,mqttRetained_1);
     } 
     else
     {

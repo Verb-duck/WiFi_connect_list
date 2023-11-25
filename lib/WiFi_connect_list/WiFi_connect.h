@@ -6,7 +6,7 @@
 #include <ArduinoOTA.h>         //ota
 #include <ESP8266httpUpdate.h>  //ota http
 #include <PubSubClient.h>       //mqtt
-
+#include "mqtt_constant.h"      //топики, команды 
 #define ssid "5G OBLUCHATEL"
 #define passwordW "00000000"
 //#define ssid "хуета"
@@ -15,24 +15,20 @@
 //функции обратного вызова при подключении, при разрыве соединения
 //WiFiEventHandler gotIpEventHandler, disconnectedEventHandler; 
 
-#define mqttServer  "192.168.3.44"
-#define mqttPort 1883
-#define mqttUser "esp"
-#define mqttPass "8266"
-#define mqttClientId "wemos_1"
-#define mqttTopicDeviceStatus "device/ota/esp1"
-#define mqttDeviceStatusOn "online"
-#define mqttDeviceStatusOff "offline"
-#define mqttDeviceStatusRetained true
-#define mqttDeviceStatusQos 1
-
+  
 class mqttObject {
 private:
 public:
 	static WiFiClient wificlient;
 	static PubSubClient mqttClient;
+  static char* mqttClientId;
+  static char* mqttTopicDeviceStatus;
+  static char* mqttTopicOta;
+
+  static void name_device(const char* name); 
 	static bool mqtt_connected();
 };
+
 
 bool WiFi_connected();				//подключение к ВиФи
 void begin_OTA_WiFi_to_IP();  // обновление по IP
