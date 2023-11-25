@@ -35,6 +35,7 @@ bool WiFi_connected()
     return true;
   }
 }
+
 // обновление по IP
 void begin_OTA_WiFi_to_IP()
 {
@@ -82,7 +83,8 @@ bool WiFi_loop()
   }
   return false;
 }
-//поиск сетей асинхронный
+
+// //поиск сетей асинхронный
 void WiFi_scan() 
 {
   WiFi.mode(WIFI_STA);
@@ -123,11 +125,23 @@ PubSubClient mqttObject::mqttClient(mqttServer, mqttPort,wificlient);
 char* mqttObject::mqttClientId ;
 char* mqttObject::mqttTopicDeviceStatus;
 char* mqttObject::mqttTopicOta;
+char* mqttObject::mqttLocationDevice;
 
-mqttObject::mqttObject(const char* name,const char* location_device) {
-  //присваение именю модулю
+//создание единственного экземляра
+mqttObject& mqttObject::generate(const char* name_device, const char* location_device) 
+{
+  static mqttObject one_copy;
+  one_copy.set_name(name_device, location_device);
+  return one_copy;
+}
+
+void mqttObject::set_name(const char* name,const char* location_device) {
+  //сохранение имени устройства
   mqttClientId = new char[strlen(name) + 1];
   strcpy(mqttClientId, name);
+  //сохранение расположения устройства в доме
+  mqttLocationDevice = new char[strlen(location_device) + 1];
+  strcpy(mqttClientId, location_device);
   //топик для отображения статуса модуля
   mqttTopicDeviceStatus = new char[strlen(name) + strlen(mqttHeadTopic)
     + strlen(location_device) +  strlen("status") + 1];
@@ -155,6 +169,9 @@ bool mqttObject::mqtt_connected()
 {
 	if (!mqttClient.connected())
   {
+    PRINT("mqttClientId",mqttClientId);
+    PRINT("mqttTopicDeviceStatus",mqttTopicDeviceStatus);
+    PRINT("mqttTopicOta",mqttTopicOta);
     Serial.print("Connecting to MQTT ... ");
     //отправка LWT сообщения
     if (mqttClient.connect(mqttClientId, mqttUser, mqttPass,

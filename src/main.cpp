@@ -15,8 +15,8 @@
 	d9 - low
 	*/
 
-  mqttObject mqtt("esp_head/" ,"bedroom/" );
-  
+//создадим всего один объект mqtt клиента 
+  mqttObject& mqttDevice = mqttObject::generate("esp_head/" ,"bedroom/" );
 void setup()
 {	
 	Serial.begin(115200);
