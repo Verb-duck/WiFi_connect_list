@@ -118,78 +118,82 @@ void WiFi_scan()
 }
 
 
-//***************mqtt*********************
-//----class mqttObject---
-WiFiClient mqttObject::wificlient;
-PubSubClient mqttObject::mqttClient(mqttServer, mqttPort,wificlient);
-char* mqttObject::mqttClientId ;
-char* mqttObject::mqttTopicDeviceStatus;
-char* mqttObject::mqttTopicOta;
-char* mqttObject::mqttLocationDevice;
+//******************MQTT**************************************
 
-//создание единственного экземляра
-mqttObject& mqttObject::generate(const char* name_device, const char* location_device) 
-{
-  static mqttObject one_copy;
-  one_copy.set_name(name_device, location_device);
-  return one_copy;
-}
+ //------------public method----------
 
-void mqttObject::set_name(const char* name,const char* location_device) {
-  //сохранение имени устройства
-  mqttClientId = new char[strlen(name) + 1];
-  strcpy(mqttClientId, name);
-  //сохранение расположения устройства в доме
-  mqttLocationDevice = new char[strlen(location_device) + 1];
-  strcpy(mqttClientId, location_device);
-  //топик для отображения статуса модуля
-  mqttTopicDeviceStatus = new char[strlen(name) + strlen(mqttHeadTopic)
-    + strlen(location_device) +  strlen("status") + 1];
-  strcpy(mqttTopicDeviceStatus,mqttHeadTopic);
-  strcat(mqttTopicDeviceStatus,location_device);
-  strcat(mqttTopicDeviceStatus,mqttClientId);
-  strcat(mqttTopicDeviceStatus,"status");
-  //топик для прошивки модуля
-  mqttTopicOta = new char[strlen(name) + strlen(mqttHeadTopic) 
-    + strlen(location_device)+ strlen("ota") + 1];
-  strcpy(mqttTopicOta,mqttHeadTopic);
-  strcat(mqttTopicOta,location_device);
-  strcat(mqttTopicOta,mqttClientId);
-  strcat(mqttTopicOta,"ota");  
-}
-
-void mqttObject::mqtt_loop()
-{
-  if (mqtt_connected())       // проверяем подключение к брокеру
-    mqttClient.loop();        // и отправляем сообщение
-}
-
-//подключение к mqtt брокеру
-bool mqttObject::mqtt_connected()
-{
-	if (!mqttClient.connected())
+  //создание единственного
+  mqttObject& mqttObject::generate(const char* name_device, const char* location_device) 
   {
-    PRINT("mqttClientId",mqttClientId);
-    PRINT("mqttTopicDeviceStatus",mqttTopicDeviceStatus);
-    PRINT("mqttTopicOta",mqttTopicOta);
-    Serial.print("Connecting to MQTT ... ");
-    //отправка LWT сообщения
-    if (mqttClient.connect(mqttClientId, mqttUser, mqttPass,
-      mqttTopicDeviceStatus, mqttQos_1 , mqttRetained_1, mqttDeviceStatusOff))      
-    {      
-      Serial.println("connected MQTT Ok.");
-      //отправим сообщение я в сети, online
-      mqttClient.publish(mqttTopicDeviceStatus, mqttDeviceStatusOn,mqttRetained_1);
-    } 
-    else
-    {
-      Serial.print("failed, error code: ");
-      Serial.print(mqttClient.state());
-      Serial.println("");
-    }
-    return mqttClient.connected();
+    static mqttObject one_copy;
+    one_copy.set_name(name_device, location_device);
+    return one_copy;
   }
-  return true;
-}
+
+  //переподключение к брокеру, отправка сообщений брокеру
+  void mqttObject::mqtt_loop()
+  {
+    if (mqtt_connected())       // проверяем подключение к брокеру
+      mqttClient.loop();        // и отправляем сообщение
+  }
+
+ //------------protected method----------
+  WiFiClient mqttObject::wificlient;
+  PubSubClient mqttObject::mqttClient(mqttServer, mqttPort,wificlient);
+  char* mqttObject::mqttClientId ;
+  char* mqttObject::mqttTopicDeviceStatus;
+  char* mqttObject::mqttTopicOta;
+  char* mqttObject::mqttLocationDevice;
+
+  void mqttObject::set_name(const char* name,const char* location_device) {
+    //сохранение имени устройства
+    mqttClientId = new char[strlen(name) + 1];
+    strcpy(mqttClientId, name);
+    //сохранение расположения устройства в доме
+    mqttLocationDevice = new char[strlen(location_device) + 1];
+    strcpy(mqttClientId, location_device);
+    //топик для отображения статуса модуля
+    mqttTopicDeviceStatus = new char[strlen(name) + strlen(mqttHeadTopic)
+      + strlen(location_device) +  strlen("status") + 1];
+    strcpy(mqttTopicDeviceStatus,mqttHeadTopic);
+    strcat(mqttTopicDeviceStatus,location_device);
+    strcat(mqttTopicDeviceStatus,mqttClientId);
+    strcat(mqttTopicDeviceStatus,"status");
+    //топик для прошивки модуля
+    mqttTopicOta = new char[strlen(name) + strlen(mqttHeadTopic) 
+      + strlen(location_device)+ strlen("ota") + 1];
+    strcpy(mqttTopicOta,mqttHeadTopic);
+    strcat(mqttTopicOta,location_device);
+    strcat(mqttTopicOta,mqttClientId);
+    strcat(mqttTopicOta,"ota");  
+  }
+
+  //подключение к mqtt брокеру
+  bool mqttObject::mqtt_connected()
+  {
+    if (!mqttClient.connected())
+    {
+      PRINT("mqttClientId",mqttClientId);
+      PRINT("mqttTopicDeviceStatus",mqttTopicDeviceStatus);
+      PRINT("mqttTopicOta",mqttTopicOta);
+      Serial.print("Connecting to MQTT ... ");
+      //отправка LWT сообщения
+      if (mqttClient.connect(mqttClientId, mqttUser, mqttPass,
+        mqttTopicDeviceStatus, mqttQos_1 , mqttRetained_1, mqttDeviceStatusOff))      
+      {      
+        Serial.println("connected MQTT Ok.");
+        //отправим сообщение я в сети, online
+        mqttClient.publish(mqttTopicDeviceStatus, mqttDeviceStatusOn,mqttRetained_1);
+      } 
+      else
+      {
+        Serial.print("failed, error code: ");
+        Serial.print(mqttClient.state());
+        Serial.println("");
+      }
+      return mqttClient.connected();
+    }
+    return true;
+  }
 
 

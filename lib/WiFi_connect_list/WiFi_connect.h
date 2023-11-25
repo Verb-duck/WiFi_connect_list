@@ -21,7 +21,7 @@
 
   
 class mqttObject {
-private:
+protected:
 	static WiFiClient wificlient;
 	static PubSubClient mqttClient;
   static char* mqttClientId;            //уникальный ID устройства
@@ -32,11 +32,10 @@ private:
   mqttObject(const mqttObject&);                //запрещаем копирование
   mqttObject& operator = (const mqttObject&);   //запрещаем копирование
   mqttObject(){}                                 //запрещаем создание
+  static void set_name (const char* name_device,const char* location_device); 
 
 public:
-
   static mqttObject& generate(const char* name_device,const char* location_device);      //создаёт всего одну копию объекта
-  static void set_name (const char* name_device,const char* location_device); 
   static void mqtt_loop();
 };
 //void mqtt_callback(char *topic, byte *payload, unsigned int length);
