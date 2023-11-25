@@ -1,8 +1,6 @@
-
-
+#define DEBUGING 1
 
 #include <Arduino.h>
-
 #include "WiFi_connect.h"
 //#include <EEPROM_memory.h>
 
@@ -17,11 +15,12 @@
 	d9 - low
 	*/
 
+  mqttObject mqtt("esp_head/" ,"bedroom/" );
+  
 void setup()
 {	
 	Serial.begin(115200);
   Serial.println();
-  mqttObject::name_device("esp_head" );
 }
 
 void loop()

@@ -13,5 +13,13 @@
   #define mqttQos_0 0
   #define mqttQos_1 1
 
+#if (DEBUGING == 1)
+  #define PRINT(title, y) \
+    Serial.print(title); \
+    Serial.print(": "); \
+    Serial.println(y);
+  #else 
+  #define PRINT(title, y) 
+  #endif
 
 #endif

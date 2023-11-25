@@ -1,5 +1,8 @@
 #ifndef WiFi_connect_h
 #define WiFi_connect_h
+
+#define DEBUGING 1
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>        //wifi
 #include <ESP8266mDNS.h>        //wifi
@@ -15,18 +18,22 @@
 //функции обратного вызова при подключении, при разрыве соединения
 //WiFiEventHandler gotIpEventHandler, disconnectedEventHandler; 
 
+
   
 class mqttObject {
 private:
-public:
 	static WiFiClient wificlient;
 	static PubSubClient mqttClient;
   static char* mqttClientId;
   static char* mqttTopicDeviceStatus;
   static char* mqttTopicOta;
-
-  static void name_device(const char* name); 
+  static char* mqttLocationDevice;
 	static bool mqtt_connected();
+
+public:
+  mqttObject (const char* name_device,const char* location_device); 
+  static void mqtt_loop();
+  static void setTopicOta (const char* topic_ota);
 };
 
 

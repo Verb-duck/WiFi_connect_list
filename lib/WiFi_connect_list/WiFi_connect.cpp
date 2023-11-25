@@ -77,10 +77,7 @@ bool WiFi_loop()
   if (WiFi_connected()) // если есть подключение
   {
     ArduinoOTA.handle(); // проверим обновление по IP
-    if (mqttObject::mqtt_connected())  // проверяем подключение к брокеру
-    {
-      mqttObject::mqttClient.loop(); // и отправляем сообщение
-    }
+    mqttObject::mqtt_loop();    
     return true;
   }
   return false;
@@ -127,23 +124,32 @@ char* mqttObject::mqttClientId ;
 char* mqttObject::mqttTopicDeviceStatus;
 char* mqttObject::mqttTopicOta;
 
-void mqttObject::name_device(const char* name) {
+mqttObject::mqttObject(const char* name,const char* location_device) {
   //присваение именю модулю
   mqttClientId = new char[strlen(name) + 1];
   strcpy(mqttClientId, name);
   //топик для отображения статуса модуля
   mqttTopicDeviceStatus = new char[strlen(name) + strlen(mqttHeadTopic)
-    + strlen("/status") + 1];
+    + strlen(location_device) +  strlen("status") + 1];
   strcpy(mqttTopicDeviceStatus,mqttHeadTopic);
+  strcat(mqttTopicDeviceStatus,location_device);
   strcat(mqttTopicDeviceStatus,mqttClientId);
-  strcat(mqttTopicDeviceStatus,"/status");
+  strcat(mqttTopicDeviceStatus,"status");
   //топик для прошивки модуля
   mqttTopicOta = new char[strlen(name) + strlen(mqttHeadTopic) 
-    + + strlen("/ota") + 1];
+    + strlen(location_device)+ strlen("ota") + 1];
   strcpy(mqttTopicOta,mqttHeadTopic);
+  strcat(mqttTopicOta,location_device);
   strcat(mqttTopicOta,mqttClientId);
-  strcat(mqttTopicOta,"/ota");  
+  strcat(mqttTopicOta,"ota");  
 }
+
+void mqttObject::mqtt_loop()
+{
+  if (mqtt_connected())       // проверяем подключение к брокеру
+    mqttClient.loop();        // и отправляем сообщение
+}
+
 //подключение к mqtt брокеру
 bool mqttObject::mqtt_connected()
 {
